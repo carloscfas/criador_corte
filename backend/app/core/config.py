@@ -3,11 +3,19 @@ from typing import Optional
 
 
 class Settings(BaseSettings):
+    # Environment
+    ENVIRONMENT: str = "development"
+    
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://admin:admin@localhost:5432/criador_cortes"
+    POSTGRES_USER: str = "admin"
+    POSTGRES_PASSWORD: str = "admin"
+    POSTGRES_DB: str = "criador_cortes"
+    POSTGRES_PORT: int = 5432
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
+    REDIS_PORT: int = 6379
     
     # Security
     SECRET_KEY: str = "your-secret-key-change-in-production"
@@ -28,6 +36,17 @@ class Settings(BaseSettings):
     # Celery
     CELERY_BROKER_URL: Optional[str] = None
     CELERY_RESULT_BACKEND: Optional[str] = None
+    
+    # CORS
+    CORS_ORIGINS: list = ["http://localhost:5173", "http://localhost:3000"]
+    
+    # Ports
+    BACKEND_PORT: int = 8000
+    FRONTEND_PORT: int = 5173
+
+    @property
+    def is_production(self) -> bool:
+        return self.ENVIRONMENT == "production"
 
     @property
     def celery_broker_url(self) -> str:

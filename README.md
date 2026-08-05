@@ -251,18 +251,49 @@ pytest --cov=app
 
 ### Produção
 
-1. Configurar variáveis de ambiente de produção
-2. Usar PostgreSQL gerenciado (RDS, Neon, etc)
-3. Usar Redis gerenciado (ElastiCache, Upstash, etc)
-4. Configurar HTTPS com certificado SSL
-5. Usar Nginx como proxy reverso
-6. Configurar backups do banco de dados
+Para deploy em produção, siga o guia completo em [DEPLOYMENT.md](./DEPLOYMENT.md).
 
-### Docker Compose (Produção)
+#### Resumo Rápido:
 
-```bash
-docker-compose -f docker-compose.prod.yml up -d
-```
+1. **Configurar variáveis de ambiente**
+   ```bash
+   cp backend/.env.example .env
+   # Edite .env com suas credenciais reais
+   ```
+
+2. **Configurar SSL/HTTPS**
+   ```bash
+   # Usar Let's Encrypt ou certificados próprios
+   mkdir ssl
+   # Copiar certificados para ssl/cert.pem e ssl/key.pem
+   ```
+
+3. **Atualizar configurações**
+   - Adicionar seu domínio em `backend/app/core/config.py` (CORS_ORIGINS)
+   - Atualizar `nginx.conf` com seu domínio
+
+4. **Deploy**
+   ```bash
+   docker compose -f docker-compose.prod.yml build
+   docker compose -f docker-compose.prod.yml up -d
+   docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
+   ```
+
+#### Requisitos de Produção:
+- **CPU**: 4+ cores (8+ recomendado)
+- **RAM**: 8GB+ (16GB+ recomendado)
+- **Storage**: 50GB+ SSD
+- **GEMINI_API_KEY**: Obrigatório
+- **Domínio com SSL**: Recomendado
+
+#### Serviços em Produção:
+- PostgreSQL com persistência
+- Redis com persistência
+- Backend FastAPI (4 workers)
+- Celery Worker (4 workers)
+- Celery Beat (para tarefas agendadas)
+- Frontend (Nginx servindo build otimizado)
+- Nginx (proxy reverso com rate limiting)
 
 ## 📝 Próximos Passos
 
